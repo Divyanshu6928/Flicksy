@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flicksy Items API Tester</title>
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#111826; --muted:#7b8794; --text:#e6edf3; --accent:#63b3ed; --ok:#34d399; --warn:#f59e0b; --err:#ef4444; --chip:#1f2937;
+    }
+    *{box-sizing:border-box}
+    html,body{height:auto}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;background:linear-gradient(135deg,#0b0f14,#0e1726 55%,#111827);color:var(--text)}
+    .container{max-width:1100px;margin:24px auto;padding:0 16px}
+    .card{background:var(--panel);border:1px solid #202a3b;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
+    h1{font-size:22px;margin:0;font-weight:700;letter-spacing:.2px}
+    .muted{color:var(--muted)}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .control{display:flex;flex-direction:column;gap:6px;min-width:160px;flex:1}
+    label{font-size:12px;color:var(--muted)}
+    input,select{background:#0f1626;border:1px solid #1f2a3d;color:var(--text);padding:10px 12px;border-radius:12px;outline:none}
+    input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,179,237,.15)}
+    button{appearance:none;border:1px solid #25456a;background:linear-gradient(180deg,#1b2b45,#122138);color:#e8f1ff;padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer}
+    button:hover{filter:brightness(1.05)}
+    .btn-primary{border-color:#2b6cb0;background:linear-gradient(180deg,#2c5282,#1a365d)}
+    .btn-ghost{background:#101823;border-color:#22304a}
+    .toolbar{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
+
+    .status{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .chip{padding:6px 10px;border-radius:999px;background:var(--chip);border:1px solid #263445;font-size:12px}
+    .chip.ok{border-color:#1f8a62;color:#b7f7dc}
+    .chip.warn{border-color:#815b16;color:#ffdf9b}
+    .chip.err{border-color:#7a1f1f;color:#ffb3b3}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+    .user{background:#0f1626;border:1px solid #1f2a3d;border-radius:16px;padding:12px;display:flex;gap:12px;align-items:center}
+    .user img{width:56px;height:56px;border-radius:14px;object-fit:cover;border:1px solid #22304a;background:#0b0f14}
+    .user .name{font-weight:700}
+    .user .meta{font-size:12px;color:var(--muted)}
+
+    details{background:#0f1626;border:1px solid #1f2a3d;border-radius:14px;padding:8px 12px}
+    summary{cursor:pointer;color:#cbd5e1}
+    pre{white-space:pre-wrap;word-wrap:break-word;margin:0;max-height:340px;overflow:auto;padding:12px;background:#0b0f14;border-radius:12px;border:1px solid #1f2a3d}
+
+    .footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" style="padding:16px 16px 10px;">
+      <header>
+        <h1>Flicksy Items API Tester</h1>
+        <span class="muted">Quickly fetch, search, and inspect your MockAPI data</span>
+      </header>
+
+      <div class="toolbar">
+        <div class="control" style="flex:2">
+          <label for="endpoint">Endpoint</label>
+          <input id="endpoint" type="url" value="https://68a8a5c1b115e67576e976e6.mockapi.io/api/flicksy/all/items" placeholder="https://..." />
+        </div>
+        <div class="control" style="max-width:120px">
+          <label for="page">Page</label>
+          <input id="page" type="number" value="1" min="1" />
+        </div>
+        <div class="control" style="max-width:120px">
+          <label for="limit">Limit</label>
+          <input id="limit" type="number" value="25" min="1" />
+        </div>
+        <div class="control" style="flex:1">
+          <label for="search">Search (MockAPI `search`)</label>
+          <input id="search" type="text" placeholder="name, id, etc." />
+        </div>
+        <div class="control" style="max-width:160px">
+          <button id="fetchBtn" class="btn-primary">GET /users</button>
+        </div>
+        <div class="control" style="max-width:160px">
+          <button id="copyCurl" class="btn-ghost" title="Copy cURL">Copy cURL</button>
+        </div>
+      </div>
+
+      <div class="status" id="status"></div>
+
+      <h3 style="margin:18px 0 10px">Results</h3>
+      <div id="results" class="grid"></div>
+
+      <details style="margin-top:14px">
+        <summary>Raw JSON</summary>
+        <pre id="raw"></pre>
+      </details>
+
+      <details style="margin-top:14px">
+        <summary>Debug Info</summary>
+        <pre id="debug"></pre>
+      </details>
+
+      <div class="footer">Tip: MockAPI supports query params like <code>?page=1&limit=10&search=abc</code>. This tool appends them for you.</div>
+    </div>
+  </div>
+
+  <script>
+    const qs = (s, el=document)=>el.querySelector(s);
+    const statusEl = qs('#status');
+    const resultsEl = qs('#results');
+    const rawEl = qs('#raw');
+    const debugEl = qs('#debug');
+
+    const endpointInput = qs('#endpoint');
+    const pageInput = qs('#page');
+    const limitInput = qs('#limit');
+    const searchInput = qs('#search');
+
+    const fetchBtn = qs('#fetchBtn');
+    const copyBtn = qs('#copyCurl');
+
+    // Persist last used endpoint
+    endpointInput.value = localStorage.getItem('flicksy_endpoint') || endpointInput.value;
+
+    function setStatus(chips){
+      statusEl.innerHTML = '';
+      chips.forEach(({text,type})=>{
+        const span = document.createElement('span');
+        span.className = `chip ${type||''}`;
+        span.textContent = text;
+        statusEl.appendChild(span);
+      });
+    }
+
+    function renderUsers(arr){
+      resultsEl.innerHTML = '';
+      if(!Array.isArray(arr) || arr.length===0){
+        resultsEl.innerHTML = '<div class="muted">No results.</div>';
+        return;
+      }
+      for(const u of arr){
+        const card = document.createElement('div');
+        card.className = 'user';
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.alt = 'avatar';
+        img.src = u.imageURL || u.image || 'https://placehold.co/112x112/111827/94a3b8?text=?';
+
+        const box = document.createElement('div');
+        const name = document.createElement('div');
+        name.className = 'name';
+        name.textContent = u.name || u.title || '(no name)';
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const idText = u.id!==undefined ? `ID: ${u.id}` : '';
+        const cat = u.category ? ` • ${u.category}` : '';
+        const price = (u.price!==undefined) ? ` • ₹${u.price}` : '';
+        meta.textContent = [idText, cat, price].filter(Boolean).join(' ');
+
+        box.appendChild(name);
+        box.appendChild(meta);
+
+        card.appendChild(img);
+        card.appendChild(box);
+        resultsEl.appendChild(card);
+      }
+    }
+
+    function toCurl(url){
+      return `curl -sS '${url}' \\n  -H 'accept: application/json'`;
+    }
+
+    async function runFetch(){
+      const base = endpointInput.value.trim();
+      if(!base){
+        alert('Please enter an endpoint URL');
+        return;
+      }
+      localStorage.setItem('flicksy_endpoint', base);
+
+      const url = new URL(base);
+      const page = parseInt(pageInput.value||'1',10);
+      const limit = parseInt(limitInput.value||'25',10);
+      if(Number.isFinite(page)) url.searchParams.set('page', String(page));
+      if(Number.isFinite(limit)) url.searchParams.set('limit', String(limit));
+      const search = (searchInput.value||'').trim();
+      if(search) url.searchParams.set('search', search);
+
+      const curl = toCurl(url.toString());
+      copyBtn.onclick = async ()=>{
+        try{await navigator.clipboard.writeText(curl);copyBtn.textContent='Copied!';setTimeout(()=>copyBtn.textContent='Copy cURL',1000);}catch(e){alert('Copy failed');}
+      };
+
+      const controller = new AbortController();
+      const timer = setTimeout(()=>controller.abort(), 20000); // 20s timeout
+
+      rawEl.textContent = '';
+      debugEl.textContent = '';
+      resultsEl.innerHTML = '';
+      setStatus([{text:'Requesting…', type:'warn'}]);
+
+      const started = performance.now();
+      try{
+        const resp = await fetch(url.toString(), {
+          headers:{'accept':'application/json'},
+          signal: controller.signal
+        });
+        const elapsed = Math.round(performance.now() - started);
+        const ok = resp.ok;
+
+        let data;
+        try{ data = await resp.json(); }
+        catch(e){ data = null; }
+
+        const count = Array.isArray(data) ? data.length : (data?1:0);
+        setStatus([
+          {text:`${resp.status} ${resp.statusText}`, type: ok ? 'ok' : 'err'},
+          {text:`${elapsed} ms`},
+          {text:`Items: ${count}`}
+        ]);
+
+        if(!ok){
+          renderUsers([]);
+          rawEl.textContent = data ? JSON.stringify(data, null, 2) : 'No JSON body';
+          debugEl.textContent = `URL: ${url}\n\ncURL:\n${curl}`;
+          return;
+        }
+
+        // Render list or single object
+        const arr = Array.isArray(data) ? data : (data ? [data] : []);
+        renderUsers(arr);
+        rawEl.textContent = JSON.stringify(data, null, 2);
+        debugEl.textContent = `URL: ${url}\n\nHeaders: accept: application/json\n\nQuery: page=${page}&limit=${limit}${search?`&search=${encodeURIComponent(search)}`:''}\n\nHint: You can also use filters like ?name=John (exact match on MockAPI).\n\nGenerated cURL:\n${curl}`;
+      } catch(err){
+        const msg = (err && err.name === 'AbortError') ? 'Request timed out' : (err && err.message) ? err.message : String(err);
+        setStatus([{text:'Network Error', type:'err'}, {text: msg}]);
+        rawEl.textContent = '';
+        resultsEl.innerHTML = '<div class="muted">Failed to fetch. Possible CORS, endpoint path, or network issue.</div>';
+        debugEl.textContent = `Error: ${msg}\n\nURL tried: ${url}`;
+      } finally{
+        clearTimeout(timer);
+      }
+    }
+
+    fetchBtn.addEventListener('click', runFetch);
+
+    // Auto-run on load
+    window.addEventListener('DOMContentLoaded', runFetch);
+
+    // Enter to fetch from search
+    searchInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ runFetch(); }});
+  </script>
+</body>
+</html>
