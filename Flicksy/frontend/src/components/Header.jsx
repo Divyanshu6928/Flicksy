@@ -150,10 +150,10 @@ const Header = () => {
         {/* Actions */}
         <div className="actions">
           <button className="action-button">
-            <i className="bi bi-cart-fill"></i>
+            <i className="bi bi-cart-fill bg-white"></i>
           </button>
           <button className="action-button">
-            <i className="bi bi-person-circle"></i>
+            <i className="bi bi-person-circle bg-white"></i>
           </button>
         </div>
       </div>
