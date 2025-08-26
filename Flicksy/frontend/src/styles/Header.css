@@ -1,9 +1,11 @@
 * {
   font-family: "Montserrat", sans-serif;
   box-sizing: border-box;
-  background-color: #ff6b00;
 }
 
+body{
+  background: #ff6b00;
+}
 
 .header-container {
   display: flex;

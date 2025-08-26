@@ -1,0 +1,123 @@
+.hero-section {
+  width: 1300px;      /* fixed width */
+  height: 500px;      /* fixed height */
+  background: url("https://res.cloudinary.com/depyc5ywg/image/upload/v1756191343/Group_40_dybpcd.png")
+              no-repeat center center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+
+  border-radius: 16px;         /* slightly smoother corners */
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25); /* adds depth */
+}
+
+.main-hero {
+  padding-left: 40px; /* looks like you want some offset inside */
+}
+
+.center-box {
+  background: rgba(255, 255, 255, 0.55); /* semi-transparent white */
+  backdrop-filter: blur(40px); 
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 20px;
+  padding: 2.5rem 3rem;
+  text-align: center;
+  border: 3px solid black;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+
+.center-box h1{
+  font-weight: bold;
+  color: black;
+  font-size: 30px;
+  margin-bottom: 50px;
+}
+
+.btnBrowse {
+  background-color: #ff6b00;
+  color: white;
+  border: 3px solid black;
+  padding: 10px 20px;
+  border-radius: 12px;
+  margin-right: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.4s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover effect */
+.btnBrowse:hover {
+  background: linear-gradient(135deg, #ff6b00, #ff9500);
+  color: #000;
+  transform: scale(1.07);
+  box-shadow: 0px 8px 20px rgba(255, 107, 0, 0.5);
+  border-radius: 30px;
+}
+
+/* Shine animation */
+.btnBrowse::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.4);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+}
+
+.btnBrowse:hover::after {
+  left: 120%;
+}
+
+
+.btnEmergency {
+  background-color: #FF4040;
+  color: white;
+  border: 3px solid black;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.4s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover effect */
+.btnEmergency:hover {
+  background: linear-gradient(135deg, #FF4040, #ff1c1c);
+  color: #000;
+  transform: scale(1.07);
+  box-shadow: 0px 8px 20px rgba(255, 64, 64, 0.6);
+  border-radius: 30px;
+}
+
+/* Shine animation */
+.btnEmergency::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.4);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+}
+
+.btnEmergency:hover::after {
+  left: 120%;
+}
+
+.btn-container{
+  display: inline-block;
+  gap: 20px ;
+}
