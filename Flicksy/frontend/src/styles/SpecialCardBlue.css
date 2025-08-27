@@ -1,0 +1,38 @@
+.special-card-container{
+    background: #fff;
+    padding: 10px;
+}
+
+.special-card h1{
+    font-family: Climate Crisis;
+    color: white;
+}
+
+.arrow-btn{
+    margin-top: 170px;
+    color: black;
+}
+
+.special-card{
+    margin: 130px;
+    padding: 20px;
+    border: 3px solid black;
+    border-radius: 12px;
+    box-shadow: 4px 4px 0px black;
+}
+
+.item-container{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.special-card-section{
+    display: flex;
+    justify-content: space-around;
+}
+
+.top-special-card{
+    display: flex;
+    justify-content: space-between;
+}

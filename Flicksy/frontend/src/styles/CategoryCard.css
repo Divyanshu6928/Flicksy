@@ -25,10 +25,13 @@
 
 
 .category-card:hover{
-    background-color: #00aae4       ;
     color: white;
+    background-color: #00aae4;
     transform: translateY(-5px);
     cursor: pointer;
-    transition: 0.5s;
-}
+    transition: 0.5s ease;
+    box-shadow: 3px 3px 0px black;
+    /* border: none; */
 
+
+}
